@@ -30,7 +30,7 @@ checkDbConnection();
  *         description: Success
  */
 app.get("/", (req: Request, res: Response) => {
-  res.json({ message: "Welcome to the RGPI Institute Management API!" });
+  res.json({ message: "Welcome to the RGPI Management API!" });
 });
 
 app.use(errorHandler);

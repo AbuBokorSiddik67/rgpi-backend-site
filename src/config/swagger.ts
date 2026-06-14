@@ -6,7 +6,7 @@ const options: Parameters<typeof swaggerJSDoc>[0] = {
   definition: {
     openapi: "3.0.0",
     info: {
-      title: "RGPI Institute Management API",
+      title: "RGPI Management API",
       version: "1.0.0",
       description: "API documentation for the RGPI backend system",
     },

@@ -47,3 +47,5 @@ export const httpLogger = pinoHttp({
     return `[HIT ERROR] ${req.method} ${req.originalUrl} - Error: ${err.message}`;
   },
 });
+
+export default logger;

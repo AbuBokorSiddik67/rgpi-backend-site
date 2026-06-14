@@ -1,26 +1,57 @@
-node_modules
-.env
-.history
-dist
-coverage
+# Dependency directories
+node_modules/
+jspm_packages/
+
+# Build and Output directories
+dist/
+build/
+coverage/
+.next/
+.out/
+
+# IDEs and Editors settings
+.idea/
+.vscode/
+*.suo
+*.ntvs*
+*.njsproj
+*.sln
+*.swp
+.history/
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Log files
 *.log
-.idea
-.vscode
-*.local
-*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Temporary/Cache files
+*.tmp
 *.backup
 *.cache
-*.tmp
-.env.*
+.eslintcache
+.npm/
+
+# Environment and Secrets (CRITICAL FOR SECURITY)
+.env
+.env.local
+.env.development
+.env.test
+.env.production
+.env.*.local
+
+# Allow example env files to be pushed to GitHub
 !.env.example
 !.env.local.example
 !.env.development.example
 !.env.test.example
 !.env.production.example
 
-
-/src/generated/prisma
-
-/src/generated/prisma
-
-/generated/prisma
+# Prisma Generated Client (To keep repository clean)
+src/generated/prisma/
+generated/prisma/
