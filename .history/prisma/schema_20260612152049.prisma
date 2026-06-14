@@ -1,0 +1,29 @@
+datasource db {
+  provider = "postgresql" // অথবা "mysql"
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+enum Role {
+  SUPER_ADMIN
+  ADMIN
+  TEACHER
+  STUDENT
+  STAFF
+}
+
+// মেইন ইউজার টেবিল ডিজাইন
+model User {
+  id        String   @id @default(uuid()) 
+  name      String
+  email     String   @unique
+  password  String
+  role      Role     @default(STUDENT)    // নতুন কেউ অ্যাকাউন্ট খুললে ডিফল্ট রোল হবে STUDENT
+  isActive  Boolean  @default(true)       // কোনো অ্যাকাউন্ট সাসপেন্ড করার জন্য অপশন
+  createdAt DateTime @default(now())      // অ্যাকাউন্ট খোলার সময়
+  updatedAt DateTime @updatedAt           // অ্যাকাউন্ট আপডেট করার সময়
+
+  @@map("users") // ডাটাবেজে টেবিলের নাম ছোট হাতের 'users' হিসেবে জমা হবে
+}
