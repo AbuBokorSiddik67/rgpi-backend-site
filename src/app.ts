@@ -33,7 +33,7 @@ checkDbConnection();
  * @openapi
  * /:
  *   get:
- *     summary: Get user profile details
+ *     summary: Get server response
  *     responses:
  *       200:
  *         description: Success
