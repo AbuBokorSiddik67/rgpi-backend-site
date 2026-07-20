@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { principalProfileController } from "./principal-profile.controller.js";
 import { authenticate, authorize } from "../../middlewares/auth.middleware.js";
-import { ROLES } from "../../constants/roles.js";
+import { ROLES } from "../../constants/constants.js";
 
 const router = Router();
 
@@ -24,7 +24,12 @@ const router = Router();
  *       400:
  *         description: Validation failed
  */
-router.post("/", authenticate,authorize(ROLES.PRINCIPAL), principalProfileController.create);
+router.post(
+  "/",
+  authenticate,
+  authorize(ROLES.PRINCIPAL),
+  principalProfileController.create,
+);
 
 /**
  * @openapi
@@ -67,7 +72,12 @@ router.get("/", authenticate, principalProfileController.getAll);
  *       404:
  *         description: PrincipalProfile not found
  */
-router.get("/:id", authenticate, authorize(ROLES.PRINCIPAL), principalProfileController.getById);
+router.get(
+  "/:id",
+  authenticate,
+  authorize(ROLES.PRINCIPAL),
+  principalProfileController.getById,
+);
 
 /**
  * @openapi
@@ -94,7 +104,12 @@ router.get("/:id", authenticate, authorize(ROLES.PRINCIPAL), principalProfileCon
  *       404:
  *         description: PrincipalProfile not found
  */
-router.patch("/:id", authenticate, authorize(ROLES.PRINCIPAL), principalProfileController.update);
+router.patch(
+  "/:id",
+  authenticate,
+  authorize(ROLES.PRINCIPAL),
+  principalProfileController.update,
+);
 
 /**
  * @openapi
@@ -114,6 +129,11 @@ router.patch("/:id", authenticate, authorize(ROLES.PRINCIPAL), principalProfileC
  *       404:
  *         description: PrincipalProfile not found
  */
-router.delete("/:id", authenticate, authorize(ROLES.PRINCIPAL), principalProfileController.remove);
+router.delete(
+  "/:id",
+  authenticate,
+  authorize(ROLES.PRINCIPAL),
+  principalProfileController.remove,
+);
 
 export const principalProfileRouter = router;

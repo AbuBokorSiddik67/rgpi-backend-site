@@ -1,7 +1,7 @@
 import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { env } from "../config/env.js";
-import type { Role } from "../constants/roles.js";
+import type { Role } from "../constants/constants.js";
 import { prisma } from "../lib/prisma.js";
 
 export interface AuthPayload {

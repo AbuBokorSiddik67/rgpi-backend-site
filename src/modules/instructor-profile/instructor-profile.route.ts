@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { instructorProfileController } from "./instructor-profile.controller.js";
 import { authenticate, authorize } from "../../middlewares/auth.middleware.js";
-import { ROLES } from "../../constants/roles.js";
+import { ROLES } from "../../constants/constants.js";
 
 const router = Router();
 

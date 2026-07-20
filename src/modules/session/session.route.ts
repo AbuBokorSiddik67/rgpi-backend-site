@@ -1,7 +1,7 @@
 import { Router } from "express";
 import { sessionController } from "./session.controller.js";
 import { authenticate, authorize } from "../../middlewares/auth.middleware.js";
-import { ROLES } from "../../constants/roles.js";
+import { ROLES } from "../../constants/constants.js";
 
 const router = Router();
 
@@ -23,7 +23,12 @@ const router = Router();
  *       400:
  *         description: Validation failed
  */
-router.post("/", authenticate,authorize(ROLES.PRINCIPAL), sessionController.create);
+router.post(
+  "/",
+  authenticate,
+  authorize(ROLES.PRINCIPAL),
+  sessionController.create,
+);
 
 /**
  * @openapi

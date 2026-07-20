@@ -1,3 +1,5 @@
+import { Gender } from "../../constants/constants";
+
 export interface CreateStudentProfileInput {
   userId: string;
   roll: string;

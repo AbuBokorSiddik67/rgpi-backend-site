@@ -1,3 +1,5 @@
+import { AttendanceStatus } from "../../constants/constants";
+
 export interface CreateAttendanceInput {
   studentId: string;
   classSessionId: string;

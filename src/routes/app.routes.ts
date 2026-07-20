@@ -20,6 +20,7 @@ import { teacherAttendanceRouter } from "../modules/teacher-attendance/teacher-a
 import { resultRouter } from "../modules/result/result.route.js";
 import { feeRouter } from "../modules/fee/fee.route.js";
 import { noticeRouter } from "../modules/notice/notice.route.js";
+import { dashboardRouter } from "../modules/dashboard/dashboard.route.js";
 
 const router = Router();
 
@@ -63,5 +64,6 @@ router.use("/notices", noticeRouter);
 // Private Routes
 router.use("/instructor-profiles", instructorProfileRouter);
 router.use("/principal-profiles", principalProfileRouter);
+router.use("/dashboard", dashboardRouter);
 
 export const appRouter = router;
