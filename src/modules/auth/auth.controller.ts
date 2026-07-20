@@ -1,6 +1,6 @@
 import { Request, Response, NextFunction } from "express";
 import { authService } from "./auth.service.js";
-import { loginSchema } from "./auth.validation.js";
+import { loginSchema, registerSchema } from "./auth.validation.js";
 import { env } from "../../config/env.js";
 
 const cookieOptions = {
@@ -11,11 +11,10 @@ const cookieOptions = {
 };
 
 export const authController = {
-
   async register(req: Request, res: Response, next: NextFunction) {
     try {
-
-      const parsed = loginSchema.safeParse(req.body);
+      // FIXED: was `loginSchema.safeParse`, so "phone" was silently dropped
+      const parsed = registerSchema.safeParse(req.body);
       if (!parsed.success) {
         return res.status(400).json({
           success: false,
@@ -53,9 +52,17 @@ export const authController = {
     }
   },
 
-  async logout(_req: Request, res: Response) {
-    res.clearCookie("token", cookieOptions);
-    res.json({ success: true, message: "Logged out successfully" });
+  async logout(req: Request, res: Response, next: NextFunction) {
+    try {
+      const token = req.cookies?.token;
+      if (token) {
+        await authService.revokeToken(token);
+      }
+      res.clearCookie("token", cookieOptions);
+      res.json({ success: true, message: "Logged out successfully" });
+    } catch (err) {
+      next(err);
+    }
   },
 
   async me(req: Request, res: Response, next: NextFunction) {

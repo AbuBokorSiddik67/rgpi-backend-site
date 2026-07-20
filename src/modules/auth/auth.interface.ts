@@ -15,7 +15,7 @@ export interface AuthUser {
   name: string | null;
   role: string;
   phone: string | null;
-  password?: string | null; 
+  password?: string | null;
 }
 
 export interface AuthResponse {

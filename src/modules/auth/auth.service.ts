@@ -1,5 +1,6 @@
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
+import { randomUUID } from "crypto";
 import { prisma } from "../../lib/prisma.js";
 import { env } from "../../config/env.js";
 import type {
@@ -7,6 +8,16 @@ import type {
   AuthResponse,
   RegisterInput,
 } from "./auth.interface.js";
+
+function signToken(user: { id: string | number; role: string; email: string }) {
+  const jti = randomUUID();
+  const token = jwt.sign(
+    { userId: user.id, role: user.role, email: user.email, jti },
+    env.jwt.secret,
+    { expiresIn: env.jwt.expiresIn as jwt.SignOptions["expiresIn"] },
+  );
+  return token;
+}
 
 export const authService = {
   async register(input: RegisterInput): Promise<AuthResponse> {
@@ -28,11 +39,7 @@ export const authService = {
       },
     });
 
-    const token = jwt.sign(
-      { userId: user.id, role: user.role, email: user.email },
-      env.jwt.secret,
-      { expiresIn: env.jwt.expiresIn as jwt.SignOptions["expiresIn"] },
-    );
+    const token = signToken(user);
 
     return {
       user: {
@@ -63,11 +70,7 @@ export const authService = {
       });
     }
 
-    const token = jwt.sign(
-      { userId: user.id, role: user.role, email: user.email },
-      env.jwt.secret,
-      { expiresIn: env.jwt.expiresIn as jwt.SignOptions["expiresIn"] },
-    );
+    const token = signToken(user);
 
     return {
       user: {
@@ -78,6 +81,25 @@ export const authService = {
       },
       token,
     } as unknown as AuthResponse & { token: string };
+  },
+
+  // Logout With Token Revocation
+  async revokeToken(token: string) {
+    const decoded = jwt.decode(token) as { jti?: string; exp?: number } | null;
+
+    if (!decoded?.jti || !decoded?.exp) {
+      // malformed/old token without a jti — nothing to revoke, just no-op
+      return;
+    }
+
+    await prisma.revokedToken.upsert({
+      where: { jti: decoded.jti },
+      update: {},
+      create: {
+        jti: decoded.jti,
+        expiresAt: new Date(decoded.exp * 1000),
+      },
+    });
   },
 
   async getMe(userId: string) {

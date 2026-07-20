@@ -63,6 +63,16 @@ enum NoticeTarget {
 }
 
 // ─────────────────────────────────────────
+// Token
+// ─────────────────────────────────────────
+model RevokedToken {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
 // INSTITUTE
 // ─────────────────────────────────────────
 

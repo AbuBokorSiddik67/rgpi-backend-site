@@ -2,18 +2,20 @@ import jwt from "jsonwebtoken";
 import { Request, Response, NextFunction } from "express";
 import { env } from "../config/env.js";
 import type { Role } from "../constants/roles.js";
+import { prisma } from "../lib/prisma.js";
 
 export interface AuthPayload {
   userId: string;
   role: Role;
   email: string;
+  jti: string;
 }
 
-export const authenticate = (
+export async function authenticate(
   req: Request,
   res: Response,
   next: NextFunction,
-) => {
+) {
   const token = req.cookies?.token;
 
   if (!token) {
@@ -22,16 +24,28 @@ export const authenticate = (
       .json({ success: false, message: "Authentication required" });
   }
 
+  let decoded: AuthPayload;
   try {
-    const decoded = jwt.verify(token, env.jwt.secret) as AuthPayload;
-    req.user = decoded;
-    next();
+    decoded = jwt.verify(token, env.jwt.secret) as AuthPayload;
   } catch {
     return res
       .status(401)
       .json({ success: false, message: "Invalid or expired token" });
   }
-};
+
+  const revoked = await prisma.revokedToken.findUnique({
+    where: { jti: decoded.jti },
+  });
+
+  if (revoked) {
+    return res
+      .status(401)
+      .json({ success: false, message: "Session expired, please login again" });
+  }
+
+  req.user = decoded;
+  next();
+}
 
 export const authorize =
   (...roles: Role[]) =>
