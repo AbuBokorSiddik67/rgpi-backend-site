@@ -18,13 +18,14 @@ const options: Parameters<typeof swaggerJSDoc>[0] = {
     ],
   },
   apis: [
-    "./src/app.ts",  
+    "./src/app.ts",
     "./src/app/routes/**/*.ts",
     "./src/app/routes/**/*.js",
     "src/routes/**/*.ts",
     "src/routes/**/*.js",
-    "./src/models/**/*.ts",
-    "./src/models/**/*.js",
+    "./src/modules/**/*.ts",
+    "./src/modules/**/*.js",
+    // "./src/models/auth/**/*.ts",
   ],
 };
 

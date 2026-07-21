@@ -1,9 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
-
 generator client {
   provider = "prisma-client"
   output   = "../generated/prisma"
@@ -11,23 +5,539 @@ generator client {
 
 datasource db {
   provider = "postgresql"
-  // url      = env("DATABASE_URL")
 }
+
+// ─────────────────────────────────────────
+// ENUMS
+// ─────────────────────────────────────────
+
+enum UserRole {
+  STUDENT
+  INSTRUCTOR
+  CI
+  PRINCIPAL
+}
+
+enum Gender {
+  MALE
+  FEMALE
+  OTHER
+}
+
+enum AttendanceStatus {
+  PRESENT
+  ABSENT
+  LATE
+}
+
+enum ClassStatus {
+  HELD
+  CANCELLED
+  SUCCESSFULL
+}
+
+enum DayOfWeek {
+  SUN
+  MON
+  TUE
+  WED
+  THU
+}
+
+enum ClassType {
+  THEORY
+  PRACTICAL
+}
+
+enum FeeStatus {
+  PAID
+  UNPAID
+  PARTIAL
+}
+
+enum NoticeTarget {
+  ALL
+  STUDENT
+  INSTRUCTOR
+  PRINCIPAL
+}
+
+// ─────────────────────────────────────────
+// Token
+// ─────────────────────────────────────────
+model RevokedToken {
+  id        String   @id @default(cuid())
+  jti       String   @unique
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+}
+
+// ─────────────────────────────────────────
+// INSTITUTE
+// ─────────────────────────────────────────
+
+model Institute {
+  id        String   @id @default(uuid())
+  name      String
+  address   String?
+  logo      String?
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  departments Department[]
+}
+
+// ─────────────────────────────────────────
+// USER
+// ─────────────────────────────────────────
 
 model User {
-  id    Int     @id @default(autoincrement())
-  email String  @unique
-  name  String?
-  role  String?
-  phone String?
-  posts Post[]
+  id        String   @id @default(uuid())
+  email     String   @unique
+  phone     String?
+  password  String
+  role      UserRole @default(STUDENT)
+  isDeleted Boolean  @default(false)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  studentProfile    StudentProfile?
+  instructorProfile InstructorProfile?
+  principalProfile  PrincipalProfile?
+
+  @@index([email])
+  @@index([role])
 }
 
-model Post {
-  id        Int     @id @default(autoincrement())
-  title     String
-  content   String?
-  published Boolean @default(false)
-  author    User    @relation(fields: [authorId], references: [id])
-  authorId  Int
+// ─────────────────────────────────────────
+// DEPARTMENT
+// ─────────────────────────────────────────
+
+model Department {
+  id          String   @id @default(uuid())
+  instituteId String
+  dptName     String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  institute   Institute           @relation(fields: [instituteId], references: [id])
+  instructors InstructorProfile[]
+  subjects    Subject[]
+  batches     Batch[]
+  routines    ClassRoutine[]
+  classRooms  ClassRoom[]
+
+  @@index([instituteId])
+}
+
+// ─────────────────────────────────────────
+// SHIFT
+// ─────────────────────────────────────────
+
+model Shift {
+  id          String   @id @default(uuid())
+  shiftNumber Int
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  batches Batch[]
+  periods Period[]
+}
+
+// ─────────────────────────────────────────
+// PERIOD
+// ─────────────────────────────────────────
+
+model Period {
+  id           String   @id @default(uuid())
+  periodNumber Int
+  startTime    String
+  endTime      String
+  shiftId      String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  shift    Shift          @relation(fields: [shiftId], references: [id])
+  routines ClassRoutine[]
+
+  @@unique([periodNumber, shiftId])
+  @@index([shiftId])
+}
+
+// ─────────────────────────────────────────
+// SEMESTER
+// ─────────────────────────────────────────
+
+model Semester {
+  id             String    @id @default(uuid())
+  semesterNumber Int
+  classLoad      Int?
+  startDate      DateTime?
+  isActive       Boolean   @default(true)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  batches  Batch[]
+  subjects Subject[]
+  routines ClassRoutine[]
+  results  Result[]
+}
+
+// ─────────────────────────────────────────
+// SESSION
+// ─────────────────────────────────────────
+
+model Session {
+  id          String   @id @default(uuid())
+  sessionYear String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  batches Batch[]
+}
+
+// ─────────────────────────────────────────
+// BATCH
+// ─────────────────────────────────────────
+
+model Batch {
+  id           String   @id @default(uuid())
+  batchName    String
+  departmentId String
+  semesterId   String
+  shiftId      String
+  sessionId    String
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  department Department       @relation(fields: [departmentId], references: [id])
+  semester   Semester         @relation(fields: [semesterId], references: [id])
+  shift      Shift            @relation(fields: [shiftId], references: [id])
+  session    Session          @relation(fields: [sessionId], references: [id])
+  students   StudentProfile[]
+  routines   ClassRoutine[]
+
+  @@index([departmentId])
+  @@index([semesterId])
+  @@index([shiftId])
+  @@index([sessionId])
+}
+
+// ─────────────────────────────────────────
+// INSTRUCTOR PROFILE
+// ─────────────────────────────────────────
+
+model InstructorProfile {
+  id             String    @id @default(uuid())
+  userId         String    @unique
+  profilePicture String?
+  adminName      String
+  acronym        String?
+  fatherName     String?
+  motherName     String?
+  address        String?
+  joiningDate    DateTime?
+  leavingDate    DateTime?
+  position       String?
+  departmentId   String
+  isActive       Boolean   @default(true)
+  isSuspended    Boolean   @default(false)
+  isAlert        Boolean   @default(false)
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  user               User                @relation(fields: [userId], references: [id])
+  department         Department          @relation(fields: [departmentId], references: [id])
+  routines           ClassRoutine[]
+  classSessions      ClassSession[]
+  teacherAttendances TeacherAttendance[]
+
+  @@index([departmentId])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// PRINCIPAL PROFILE
+// ─────────────────────────────────────────
+
+model PrincipalProfile {
+  id                String    @id @default(uuid())
+  userId            String    @unique
+  profilePicture    String?
+  superAdminName    String
+  joiningDate       DateTime?
+  leavingDate       DateTime?
+  pastInstituteName String?
+  createdAt         DateTime  @default(now())
+  updatedAt         DateTime  @updatedAt
+
+  user User @relation(fields: [userId], references: [id])
+}
+
+// ─────────────────────────────────────────
+// STUDENT PROFILE
+// ─────────────────────────────────────────
+
+model StudentProfile {
+  id             String   @id @default(uuid())
+  userId         String   @unique
+  roll           String   @unique
+  registration   String?  @unique
+  profilePicture String?
+  studentName    String
+  fatherName     String?
+  motherName     String?
+  birthIdNo      String?
+  nidNo          String?
+  fatherNidNo    String?
+  motherNidNo    String?
+  address        String?
+  gender         Gender?
+  batchId        String
+  isStripend     Boolean  @default(false)
+  isSuspended    Boolean  @default(false)
+  isActive       Boolean  @default(true)
+  isAlert        Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  user        User         @relation(fields: [userId], references: [id])
+  batch       Batch        @relation(fields: [batchId], references: [id])
+  attendances Attendance[]
+  fees        Fee[]
+  results     Result[]
+
+  @@index([batchId])
+  @@index([roll])
+  @@index([userId])
+}
+
+// ─────────────────────────────────────────
+// SUBJECT
+// ─────────────────────────────────────────
+
+model Subject {
+  id             String   @id @default(uuid())
+  subjectName    String
+  subjectCode    String
+  credit         Int
+  theoryClass    Int
+  practicalClass Int
+  contTheory     Int?
+  finalTheory    Int?
+  contPractical  Int?
+  finalPractical Int?
+  grandTotal     Int
+  departmentId   String
+  semesterId     String
+  isActive       Boolean  @default(true)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  department Department     @relation(fields: [departmentId], references: [id])
+  semester   Semester       @relation(fields: [semesterId], references: [id])
+  routines   ClassRoutine[]
+  results    Result[]
+
+  @@index([departmentId])
+  @@index([semesterId])
+  @@index([subjectCode])
+}
+
+// ─────────────────────────────────────────
+// CLASS ROOM
+// ─────────────────────────────────────────
+
+model ClassRoom {
+  id              String   @id @default(uuid())
+  classRoomNumber String
+  departmentId    String
+  isActive        Boolean  @default(true)
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  department Department     @relation(fields: [departmentId], references: [id])
+  routines   ClassRoutine[]
+
+  @@index([departmentId])
+}
+
+// ─────────────────────────────────────────
+// CLASS ROUTINE
+// ─────────────────────────────────────────
+
+model ClassRoutine {
+  id           String    @id @default(uuid())
+  departmentId String
+  batchId      String
+  semesterId   String
+  subjectId    String
+  teacherId    String
+  classRoomId  String
+  periodId     String
+  dayOfWeek    DayOfWeek
+  classType    ClassType
+  isActive     Boolean   @default(true)
+  createdAt    DateTime  @default(now())
+  updatedAt    DateTime  @updatedAt
+
+  department    Department        @relation(fields: [departmentId], references: [id])
+  batch         Batch             @relation(fields: [batchId], references: [id])
+  semester      Semester          @relation(fields: [semesterId], references: [id])
+  subject       Subject           @relation(fields: [subjectId], references: [id])
+  teacher       InstructorProfile @relation(fields: [teacherId], references: [id])
+  classRoom     ClassRoom         @relation(fields: [classRoomId], references: [id])
+  period        Period            @relation(fields: [periodId], references: [id])
+  classSessions ClassSession[]
+
+  // Conflict prevention
+  @@unique([periodId, dayOfWeek, classRoomId])
+  @@unique([periodId, dayOfWeek, teacherId])
+  @@unique([periodId, dayOfWeek, batchId])
+  // Fast query index
+  @@index([batchId, dayOfWeek])
+  @@index([teacherId, dayOfWeek])
+  @@index([semesterId])
+}
+
+// ─────────────────────────────────────────
+// CLASS SESSION
+// ─────────────────────────────────────────
+
+model ClassSession {
+  id        String      @id @default(uuid())
+  routineId String
+  teacherId String
+  date      DateTime
+  status    ClassStatus @default(HELD)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
+
+  routine            ClassRoutine        @relation(fields: [routineId], references: [id])
+  teacher            InstructorProfile   @relation(fields: [teacherId], references: [id])
+  attendances        Attendance[]
+  teacherAttendances TeacherAttendance[]
+
+  @@index([routineId, date])
+  @@index([teacherId, date])
+  @@index([date])
+}
+
+// ─────────────────────────────────────────
+// ATTENDANCE
+// ─────────────────────────────────────────
+
+model Attendance {
+  id             String           @id @default(uuid())
+  studentId      String
+  classSessionId String
+  status         AttendanceStatus @default(ABSENT)
+  markedAt       DateTime         @default(now())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  student      StudentProfile @relation(fields: [studentId], references: [id])
+  classSession ClassSession   @relation(fields: [classSessionId], references: [id])
+
+  @@unique([studentId, classSessionId])
+  @@index([studentId])
+  @@index([classSessionId])
+  @@index([status])
+}
+
+// ─────────────────────────────────────────
+// TEACHER ATTENDANCE
+// ─────────────────────────────────────────
+
+model TeacherAttendance {
+  id             String           @id @default(uuid())
+  teacherId      String
+  classSessionId String
+  status         AttendanceStatus @default(ABSENT)
+  markedAt       DateTime         @default(now())
+  createdAt      DateTime         @default(now())
+  updatedAt      DateTime         @updatedAt
+
+  teacher      InstructorProfile @relation(fields: [teacherId], references: [id])
+  classSession ClassSession      @relation(fields: [classSessionId], references: [id])
+
+  @@unique([teacherId, classSessionId])
+  @@index([teacherId])
+  @@index([classSessionId])
+}
+
+// ─────────────────────────────────────────
+// RESULT 
+// ─────────────────────────────────────────
+
+model Result {
+  id             String   @id @default(uuid())
+  studentId      String
+  subjectId      String
+  semesterId     String
+  contTheory     Float?
+  finalTheory    Float?
+  contPractical  Float?
+  finalPractical Float?
+  totalMarks     Float?
+  grade          String?
+  gpa            Float?
+  isPublished    Boolean  @default(false)
+  createdAt      DateTime @default(now())
+  updatedAt      DateTime @updatedAt
+
+  student  StudentProfile @relation(fields: [studentId], references: [id])
+  subject  Subject        @relation(fields: [subjectId], references: [id])
+  semester Semester       @relation(fields: [semesterId], references: [id])
+
+  @@unique([studentId, subjectId, semesterId])
+  @@index([studentId])
+  @@index([semesterId])
+  @@index([isPublished])
+}
+
+// ─────────────────────────────────────────
+// FEE 
+// ─────────────────────────────────────────
+
+model Fee {
+  id        String    @id @default(uuid())
+  studentId String
+  amount    Float
+  status    FeeStatus @default(UNPAID)
+  dueDate   DateTime
+  paidAt    DateTime?
+  remark    String?
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  student StudentProfile @relation(fields: [studentId], references: [id])
+
+  @@index([studentId])
+  @@index([status])
+  @@index([dueDate])
+}
+
+// ─────────────────────────────────────────
+// NOTICE 
+// ─────────────────────────────────────────
+
+model Notice {
+  id          String       @id @default(uuid())
+  title       String
+  body        String
+  target      NoticeTarget @default(ALL)
+  publishedAt DateTime     @default(now())
+  isActive    Boolean      @default(true)
+  createdAt   DateTime     @default(now())
+  updatedAt   DateTime     @updatedAt
+
+  @@index([target])
+  @@index([publishedAt])
 }
