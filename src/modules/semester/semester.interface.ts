@@ -1,13 +1,13 @@
 export interface CreateSemesterInput {
   semesterNumber: number;
   classLoad?: number;
-  startDate?: string;
+  startDate?: Date;
 }
 
 export interface UpdateSemesterInput {
   semesterNumber?: number;
   classLoad?: number;
-  startDate?: string;
+  startDate?: Date;
 }
 
 export interface SemesterQueryParams {

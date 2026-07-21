@@ -1,8 +1,9 @@
-import type { AttendanceStatus, NoticeTarget } from "../../generated/prisma/index.js"; // adjust path to match your prisma client output
 
 /* ─────────────────────────────────────────
    STUDENT
 ───────────────────────────────────────── */
+
+import { AttendanceStatus, NoticeTarget } from "../../../generated/prisma/enums";
 
 export interface AttendanceQuery {
   subjectId?: string;

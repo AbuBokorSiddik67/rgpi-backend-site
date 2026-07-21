@@ -85,7 +85,7 @@ export const teacherDashboardController = {
     try {
       const userId = req.user!.userId as string;
       const { sessionId } = req.params;
-      const data = await dashboardService.getSessionStudents(userId, sessionId);
+      const data = await dashboardService.getSessionStudents(userId as string, sessionId as string);
       res.json({ success: true, data });
     } catch (err) {
       next(err);
@@ -104,7 +104,7 @@ export const teacherDashboardController = {
 
       const userId = req.user!.userId as string;
       const { sessionId } = req.params;
-      await dashboardService.submitAttendance(userId, sessionId, parsed.data);
+      await dashboardService.submitAttendance(userId as string, sessionId as string, parsed.data);
       res.json({ success: true, message: "Attendance submitted successfully" });
     } catch (err) {
       next(err);
@@ -173,7 +173,7 @@ export const adminDashboardController = {
       }
 
       const { id } = req.params;
-      const data = await dashboardService.updateStudentStatus(id, parsed.data);
+      const data = await dashboardService.updateStudentStatus(id as string, parsed.data);
       res.json({ success: true, message: "Student status updated", data });
     } catch (err) {
       next(err);
@@ -191,7 +191,7 @@ export const adminDashboardController = {
       }
 
       const { id } = req.params;
-      const data = await dashboardService.updateTeacherStatus(id, parsed.data);
+      const data = await dashboardService.updateTeacherStatus(id as string, parsed.data);
       res.json({ success: true, message: "Teacher status updated", data });
     } catch (err) {
       next(err);
@@ -226,7 +226,7 @@ export const adminDashboardController = {
       }
 
       const { id } = req.params;
-      const data = await dashboardService.updateNotice(id, parsed.data);
+      const data = await dashboardService.updateNotice(id as string, parsed.data);
       res.json({ success: true, message: "Notice updated", data });
     } catch (err) {
       next(err);
@@ -236,7 +236,7 @@ export const adminDashboardController = {
   async deleteNotice(req: Request, res: Response, next: NextFunction) {
     try {
       const { id } = req.params;
-      await dashboardService.deleteNotice(id);
+      await dashboardService.deleteNotice(id as string);
       res.json({ success: true, message: "Notice deleted" });
     } catch (err) {
       next(err);
