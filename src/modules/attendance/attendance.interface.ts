@@ -4,14 +4,14 @@ export interface CreateAttendanceInput {
   studentId: string;
   classSessionId: string;
   status?: AttendanceStatus;
-  markedAt?: string;
+  markedAt?: Date;
 }
 
 export interface UpdateAttendanceInput {
   studentId?: string;
   classSessionId?: string;
   status?: AttendanceStatus;
-  markedAt?: string;
+  markedAt?: Date;
 }
 
 export interface AttendanceQueryParams {

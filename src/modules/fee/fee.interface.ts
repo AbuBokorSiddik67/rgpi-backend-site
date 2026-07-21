@@ -1,9 +1,11 @@
+import { FeeStatus } from "../../../generated/prisma/enums";
+
 export interface CreateFeeInput {
   studentId: string;
   amount: number;
   status?: FeeStatus;
-  dueDate: string;
-  paidAt?: string;
+  dueDate: Date;
+  paidAt?: Date;
   remark?: string;
 }
 
@@ -11,8 +13,8 @@ export interface UpdateFeeInput {
   studentId?: string;
   amount?: number;
   status?: FeeStatus;
-  dueDate?: string;
-  paidAt?: string;
+  dueDate?: Date;
+  paidAt?: Date;
   remark?: string;
 }
 

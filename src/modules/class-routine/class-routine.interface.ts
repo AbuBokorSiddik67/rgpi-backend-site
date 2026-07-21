@@ -1,3 +1,5 @@
+import { ClassType, DayOfWeek } from "../../../generated/prisma/enums";
+
 export interface CreateClassRoutineInput {
   departmentId: string;
   batchId: string;
