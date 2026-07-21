@@ -108,7 +108,6 @@ export const authService = {
       select: {
         id: true,
         email: true,
-        name: true,
         role: true,
         phone: true,
       },
