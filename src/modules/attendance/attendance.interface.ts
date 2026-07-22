@@ -1,4 +1,4 @@
-import { AttendanceStatus } from "../../constants/constants";
+import { AttendanceStatus } from "../../constants/constants.js";
 
 export interface CreateAttendanceInput {
   studentId: string;
