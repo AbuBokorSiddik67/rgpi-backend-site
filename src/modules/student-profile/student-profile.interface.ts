@@ -1,4 +1,4 @@
-import { Gender } from "../../constants/constants";
+import { Gender } from "../../constants/constants.js";
 
 export interface CreateStudentProfileInput {
   userId: string;
