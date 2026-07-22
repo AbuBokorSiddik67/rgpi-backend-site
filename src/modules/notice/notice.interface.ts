@@ -1,4 +1,4 @@
-import { NoticeTarget } from "../../../generated/prisma/enums";
+import { NoticeTarget } from "@prisma/client";
 
 export interface CreateNoticeInput {
   title: string;
