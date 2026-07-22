@@ -12,6 +12,10 @@ const options: Parameters<typeof swaggerJSDoc>[0] = {
     },
     servers: [
       {
+        url: "/",
+        description: "Current Environment (Local or Vercel)",
+      },
+      {
         url: "http://localhost:5000",
         description: "Development server",
       },
@@ -21,16 +25,28 @@ const options: Parameters<typeof swaggerJSDoc>[0] = {
     "./src/app.ts",
     "./src/app/routes/**/*.ts",
     "./src/app/routes/**/*.js",
-    "src/routes/**/*.ts",
-    "src/routes/**/*.js",
+    "./src/routes/**/*.ts",
+    "./src/routes/**/*.js",
     "./src/modules/**/*.ts",
     "./src/modules/**/*.js",
-    // "./src/models/auth/**/*.ts",
   ],
 };
 
 const swaggerSpec = swaggerJSDoc(options);
 
+const swaggerUiOptions = {
+  customCssUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui.min.css",
+  customJs: [
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-bundle.js",
+    "https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/4.18.3/swagger-ui-standalone-preset.js",
+  ],
+};
+
 export function setupSwagger(app: Application): void {
-  app.use("/api-docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
+  app.use(
+    "/api-docs",
+    swaggerUi.serve,
+    swaggerUi.setup(swaggerSpec, swaggerUiOptions),
+  );
 }
