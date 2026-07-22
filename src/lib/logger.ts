@@ -1,22 +1,26 @@
 import { Request } from "express";
-
 import pino from "pino";
 import { pinoHttp } from "pino-http";
 
-const isProduction = process.env.NODE_ENV === "production";
+// Vercel বা Production এনভায়রনমেন্ট চেক
+const isProduction =
+  process.env.NODE_ENV === "production" || process.env.VERCEL === "1";
 
 export const logger = pino({
   level: isProduction ? "info" : "debug",
-  transport: !isProduction
-    ? {
-        target: "pino-pretty",
-        options: {
-          colorize: true,
-          translateTime: "SYS:standard",
-          ignore: "pid,hostname",
+  // Vercel/Production এ কখনই transport সেট করা হবে না
+  ...(isProduction
+    ? {}
+    : {
+        transport: {
+          target: "pino-pretty",
+          options: {
+            colorize: true,
+            translateTime: "SYS:standard",
+            ignore: "pid,hostname",
+          },
         },
-      }
-    : undefined,
+      }),
 });
 
 export const httpLogger = pinoHttp({
