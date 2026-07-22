@@ -12,6 +12,7 @@ import { notFound } from "./utils/notFound.js";
 
 const app: Application = express();
 
+app.set("trust proxy", true);
 app.use(httpLogger);
 app.use(helmet());
 app.use(
