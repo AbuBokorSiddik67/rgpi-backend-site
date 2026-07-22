@@ -1,9 +1,8 @@
-
 /* ─────────────────────────────────────────
    STUDENT
 ───────────────────────────────────────── */
 
-import { AttendanceStatus, NoticeTarget } from "../../../generated/prisma/enums";
+import { AttendanceStatus, NoticeTarget } from "@prisma/client";
 
 export interface AttendanceQuery {
   subjectId?: string;

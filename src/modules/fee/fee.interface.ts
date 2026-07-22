@@ -1,4 +1,4 @@
-import { FeeStatus } from "../../../generated/prisma/enums";
+import { FeeStatus } from "@prisma/client";
 
 export interface CreateFeeInput {
   studentId: string;

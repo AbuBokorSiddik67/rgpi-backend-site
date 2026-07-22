@@ -1,4 +1,4 @@
-import { ClassType, DayOfWeek } from "../../../generated/prisma/enums";
+import { ClassType, DayOfWeek } from "@prisma/client";
 
 export interface CreateClassRoutineInput {
   departmentId: string;

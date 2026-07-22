@@ -1,4 +1,4 @@
-import { ClassStatus } from "../../../generated/prisma/enums";
+import { ClassStatus } from "@prisma/client";
 
 export interface CreateClassSessionInput {
   routineId: string;
