@@ -1,6 +1,11 @@
 import swaggerJSDoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
 import { Application } from "express";
+import path from "path";
+import { fileURLToPath } from "url";
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const options: Parameters<typeof swaggerJSDoc>[0] = {
   definition: {
@@ -22,13 +27,14 @@ const options: Parameters<typeof swaggerJSDoc>[0] = {
     ],
   },
   apis: [
-    "./src/app.ts",
-    "./src/app/routes/**/*.ts",
-    "./src/app/routes/**/*.js",
-    "./src/routes/**/*.ts",
-    "./src/routes/**/*.js",
-    "./src/modules/**/*.ts",
-    "./src/modules/**/*.js",
+    path.join(__dirname, "../app.ts"),
+    path.join(__dirname, "../app.js"),
+    path.join(__dirname, "../app/routes/**/*.ts"),
+    path.join(__dirname, "../app/routes/**/*.js"),
+    path.join(__dirname, "../modules/**/*.ts"),
+    path.join(__dirname, "../modules/**/*.js"),
+    path.join(__dirname, "../routes/**/*.ts"),
+    path.join(__dirname, "../routes/**/*.js"),
   ],
 };
 
