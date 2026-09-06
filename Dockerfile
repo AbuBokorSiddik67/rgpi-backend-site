@@ -1,32 +1,46 @@
 # --- Stage 1: Build Stage ---
 FROM node:20-alpine AS builder
 
+# Enable pnpm via Corepack
+RUN corepack enable && corepack prepare pnpm@latest --activate
+
 WORKDIR /app
 
-COPY package*.json ./
+# Copy dependency definition files
+COPY package.json pnpm-lock.yaml ./
 COPY prisma ./prisma/
 
-RUN npm ci
+# Install all dependencies (including devDependencies needed for build)
+RUN pnpm install --frozen-lockfile
 
+# Generate Prisma Client
 RUN npx prisma generate
 
 COPY . .
 
-RUN npm run build
+# Build the project
+RUN pnpm build
 
-RUN npm prune --production
 
-
+# --- Stage 2: Production Stage ---
 FROM node:20-alpine
+
+# Enable pnpm in production stage as well
+RUN corepack enable && corepack prepare pnpm@latest --activate
 
 WORKDIR /app
 
-COPY --from=builder /app/package*.json ./
-COPY --from=builder /app/node_modules ./node_modules
+COPY package.json pnpm-lock.yaml ./
+COPY prisma ./prisma/
+
+# Install ONLY production dependencies to keep the image small
+RUN pnpm install --prod --frozen-lockfile
+
+# Copy built dist directory from builder stage
 COPY --from=builder /app/dist ./dist
+# Copy generated Prisma Client if it outputs outside node_modules
 COPY --from=builder /app/generated ./generated
-COPY --from=builder /app/prisma ./prisma
 
 EXPOSE 5000
 
-CMD ["npm", "run", "start"]
+CMD ["pnpm", "start"]
