@@ -1,5 +1,4 @@
 import { NextFunction, Request, Response } from 'express';
-import { env } from '../../config/env.js';
 import { authService } from './auth.service.js';
 import { loginSchema, registerSchema } from './auth.validation.js';
 
@@ -7,7 +6,7 @@ import { CookieOptions } from 'express';
 
 const cookieOptions: CookieOptions = {
   httpOnly: true,
-  secure: env.nodeEnv === 'production',
+  secure: true,
   sameSite: "none" as const,
   maxAge: 7 * 24 * 60 * 60 * 1000,
 };

@@ -17,30 +17,36 @@ app.set('trust proxy', 1);
 
 app.use(httpLogger);
 
-// 2. Helmet with Cross-Origin Resource Sharing allowed
+// 2. Helmet with Cross-Origin Policy configured for Cookies
 app.use(
   helmet({
     crossOriginResourcePolicy: { policy: 'cross-origin' },
+    crossOriginOpenerPolicy: { policy: 'same-origin-allow-popups' },
   }),
 );
 
-// 3. Dynamic CORS Configuration (Supports local & production frontend URLs)
+// 3. Dynamic CORS Configuration
 const allowedOrigins = [
   'http://localhost:3000',
-  process.env.CORS_ORIGIN, // e.g., "https://your-frontend.vercel.app"
+  'http://127.0.0.1:3000',
+  process.env.CORS_ORIGIN,
 ].filter(Boolean) as string[];
 
 app.use(
   cors({
     origin: (origin, callback) => {
-      // Allow requests with no origin (like mobile apps or curl)
+      // Allow requests with no origin (like Postman or server-to-server)
       if (!origin) return callback(null, true);
 
-      // Check allowed origins or match any vercel preview deployment
-      if (allowedOrigins.includes(origin) || origin.endsWith('.vercel.app')) {
+      // Check allowed origins or Vercel preview URLs
+      const isAllowed =
+        allowedOrigins.includes(origin) || origin.endsWith('.vercel.app');
+
+      if (isAllowed) {
         return callback(null, true);
+      } else {
+        return callback(new Error('Not allowed by CORS'));
       }
-      return callback(null, true); // Or callback(new Error("Not allowed by CORS"))
     },
     credentials: true,
   }),
